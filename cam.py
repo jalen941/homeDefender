@@ -6,6 +6,18 @@ from PIL import Image
 import requests
 
 import os
+import pygame
+
+# Initialize pygame mixer
+pygame.mixer.init()
+
+# Load the alarm sound file
+#alarm_sound = pygame.mixer.Sound('alarm.wav')  # Replace 'alarm.wav' with the path to your alarm sound file
+
+# Function to play the alarm sound
+
+
+
 
 # Load the Haar cascade classifier for face detection
 alg = "faceData.xml"
@@ -59,23 +71,61 @@ def upload_sample_face_embedding(sample_img_path):
     firebase_utility.put_data("sample_faces", {"embedding": sample_embedding})
 
 # Usage: Call this function with the path to the sample face image
-sample_img_path = "myFace.jpg"  # Replace with the actual path
-upload_sample_face_embedding(sample_img_path)
+
+upload_sample_face_embedding("myFace.jpg")
+upload_sample_face_embedding("WIN_20240402_19_12_24_Pro.jpg")
+upload_sample_face_embedding("WIN_20240402_19_12_26_Pro.jpg")
+upload_sample_face_embedding("WIN_20240402_19_12_27_Pro.jpg")
+upload_sample_face_embedding("WIN_20240402_19_12_28_Pro.jpg")
+upload_sample_face_embedding("WIN_20240402_19_12_29_Pro.jpg")
+upload_sample_face_embedding("WIN_20240402_19_12_30_Pro.jpg")
+upload_sample_face_embedding("WIN_20240402_19_12_31_Pro.jpg")
+upload_sample_face_embedding("WIN_20240402_19_12_33_Pro.jpg")
+upload_sample_face_embedding("WIN_20240402_19_12_34_Pro.jpg")
+upload_sample_face_embedding("WIN_20240402_19_12_35_Pro.jpg")
+upload_sample_face_embedding("WIN_20240402_19_12_36_Pro.jpg")
+upload_sample_face_embedding("WIN_20240402_19_12_38_Pro.jpg")
+upload_sample_face_embedding("WIN_20240402_19_12_39_Pro.jpg")
+upload_sample_face_embedding("WIN_20240402_19_12_42_Pro.jpg")
+upload_sample_face_embedding("WIN_20240402_19_12_45_Pro.jpg")
+upload_sample_face_embedding("WIN_20240402_19_12_51_Pro.jpg")
+upload_sample_face_embedding("WIN_20240402_19_12_56_Pro.jpg")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # Function to check if a face matches the sample face
 def is_face_matching(embedding):
-    # Load the sample face embedding from Firebase
-    sample_embedding = firebase_utility.get_data("sample_faces", "embedding")
-    # Compare the embeddings (for demonstration, we'll use a simple distance metric)
-    distance = np.linalg.norm(np.array(embedding) - np.array(sample_embedding))
-    # Set a threshold for matching
-    print(distance)
-    # threshold = 0.1
-    if distance < 16:
-        return True
-    else:
-        return False
+    # Load all sample face embeddings from Firebase
+    sample_faces = firebase_utility.get_all_data("sample_faces")
+
+    if sample_faces is not None:
+        # Compare the detected face embedding with each sample face embedding
+        for data in sample_faces.values():
+            sample_embedding = data.get("embedding")
+            if sample_embedding is not None:
+                # Calculate the Euclidean distance between embeddings
+                distance = np.linalg.norm(np.array(embedding) - np.array(sample_embedding))
+                # Set a threshold for matching
+                print(distance)
+                if distance < 16:
+                    return True
+
+    # If no matching embedding is found, return False
+    return False
+
 
 # Main loop to capture video frames
 while True:
@@ -140,6 +190,7 @@ while True:
                 send_message("an unknown person is on your property")
                 color = (0, 0, 255)  # Red color
             cv2.rectangle(frame, (x, y), (x+w, y+h), color, 2)
+
         # Display the frame
         cv2.imshow("Face Detection", frame)
         # Check for key press (q to quit)

@@ -35,7 +35,11 @@ class FirebaseUtility:
             print("Error getting data:", e)
             return None
 
-
-
+    def get_all_data(self, table_name):
+        try:
+            return self.db.child(table_name).get()
+        except Exception as e:
+            print("Error getting all data:", e)
+            return None
 
 
