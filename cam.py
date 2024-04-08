@@ -71,6 +71,7 @@ def upload_sample_face_embedding(sample_img_path):
     firebase_utility.put_data("sample_faces", {"embedding": sample_embedding})
 
 # Usage: Call this function with the path to the sample face image
+'''
 
 upload_sample_face_embedding("myFace.jpg")
 upload_sample_face_embedding("WIN_20240402_19_12_24_Pro.jpg")
@@ -91,6 +92,7 @@ upload_sample_face_embedding("WIN_20240402_19_12_45_Pro.jpg")
 upload_sample_face_embedding("WIN_20240402_19_12_51_Pro.jpg")
 upload_sample_face_embedding("WIN_20240402_19_12_56_Pro.jpg")
 
+'''
 
 
 
@@ -126,7 +128,9 @@ def is_face_matching(embedding):
     # If no matching embedding is found, return False
     return False
 
-
+total_frames = 0
+green_count = 0  # Number of times box showed green
+red_count = 0    # Number of times box showed red
 # Main loop to capture video frames
 while True:
     # Read a frame from the webcam
@@ -159,6 +163,7 @@ while True:
         faces = haar_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
         # Loop through the detected faces
         for x, y, w, h in faces:
+            total_frames += 1  # Increment total frames count
 
             box_area = w * h
 
@@ -171,7 +176,7 @@ while True:
                 print(distance_estimation)
             else:  # Large box => person close to the camera
                 distance_estimation = "Close"
-                send_message("someone is on your property")
+                #send_message("someone is on your property")
                 print(distance_estimation)
 
 
@@ -185,17 +190,33 @@ while True:
             if is_face_matching(embedding):
                 # Outline the face in green if it matches the sample face
                 color = (0, 255, 0)  # Green color
+                green_count += 1
             else:
                 # Outline the face in red if it doesn't match the sample face
-                send_message("an unknown person is on your property")
+                #send_message("an unknown person is on your property")
                 color = (0, 0, 255)  # Red color
+                red_count += 1
             cv2.rectangle(frame, (x, y), (x+w, y+h), color, 2)
 
         # Display the frame
         cv2.imshow("Face Detection", frame)
+
+        if total_frames >= 30:
+            break
         # Check for key press (q to quit)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
+
+# Calculate proportions
+proportion_correct = green_count / total_frames
+proportion_incorrect = red_count / total_frames
+
+# Print statistics
+print("Total frames:", total_frames)
+print("Green count (correctly identified):", green_count)
+print("Red count (not recognized):", red_count)
+print("Proportion of correct identifications:", proportion_correct)
+print("Proportion of incorrect identifications:", proportion_incorrect)
 
 # Release the webcam and close all windows
 video.release()
