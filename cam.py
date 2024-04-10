@@ -4,7 +4,7 @@ import firebaseUtility
 import numpy as np
 from PIL import Image
 import requests
-
+import time
 import os
 import pygame
 
@@ -15,9 +15,6 @@ pygame.mixer.init()
 #alarm_sound = pygame.mixer.Sound('alarm.wav')  # Replace 'alarm.wav' with the path to your alarm sound file
 
 # Function to play the alarm sound
-
-
-
 
 # Load the Haar cascade classifier for face detection
 alg = "faceData.xml"
@@ -60,8 +57,6 @@ def calculate_embeddings(face_img):
     return embedding[0].tolist()
 
 
-
-
 def upload_sample_face_embedding(sample_img_path):
     # Read the sample face image
     sample_img = cv2.imread(sample_img_path)
@@ -95,19 +90,6 @@ upload_sample_face_embedding("WIN_20240402_19_12_56_Pro.jpg")
 '''
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 # Function to check if a face matches the sample face
 def is_face_matching(embedding):
     # Load all sample face embeddings from Firebase
@@ -131,8 +113,12 @@ def is_face_matching(embedding):
 total_frames = 0
 green_count = 0  # Number of times box showed green
 red_count = 0    # Number of times box showed red
+
+
+
 # Main loop to capture video frames
 while True:
+    time_sec = time.time()
     # Read a frame from the webcam
     check, frame = video.read()
     if frame is not None:
@@ -156,48 +142,47 @@ while True:
             # Store the current frame for comparison in the next iteration
         prev_frame = gray.copy()
 
-        # Display the frame
-        cv2.imshow("Motion Detection", frame)
-
         # Detect faces in the frame
-        faces = haar_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
-        # Loop through the detected faces
-        for x, y, w, h in faces:
-            total_frames += 1  # Increment total frames count
+        print ("time: ", time_sec)
+        if int(time_sec) % 10 == 0:
+            faces = haar_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+            # Loop through the detected faces
+            for x, y, w, h in faces:
+                total_frames += 1  # Increment total frames count
 
-            box_area = w * h
-
-
-            if box_area < 5000:  # Small box => person far from the camera
-                distance_estimation = "Far (5-10 feet)"
-                print(distance_estimation)
-            elif box_area < 15000:  # Medium box => person at a decent distance
-                distance_estimation = "Decent distance"
-                print(distance_estimation)
-            else:  # Large box => person close to the camera
-                distance_estimation = "Close"
-                #send_message("someone is on your property")
-                print(distance_estimation)
+                box_area = w * h
 
 
+                if box_area < 5000:  # Small box => person far from the camera
+                    distance_estimation = "Far (5-10 feet)"
+                    print(distance_estimation)
+                elif box_area < 15000:  # Medium box => person at a decent distance
+                    distance_estimation = "Decent distance"
+                    print(distance_estimation)
+                else:  # Large box => person close to the camera
+                    distance_estimation = "Close"
+                    print(distance_estimation)
+                    if (int(time_sec) % 120 == 0):
+                       send_message("someone is on your property")
 
-            # Crop the face region
-            face_img = frame[y:y+h, x:x+w]
-            # Calculate embeddings for the face
-            embedding = calculate_embeddings(face_img)
-            print(embedding)
-            # Check if the face matches the sample face
-            if is_face_matching(embedding):
-                # Outline the face in green if it matches the sample face
-                color = (0, 255, 0)  # Green color
-                green_count += 1
-            else:
-                # Outline the face in red if it doesn't match the sample face
-                #send_message("an unknown person is on your property")
-                color = (0, 0, 255)  # Red color
-                red_count += 1
-            cv2.rectangle(frame, (x, y), (x+w, y+h), color, 2)
 
+
+                # Crop the face region
+                face_img = frame[y:y+h, x:x+w]
+                # Calculate embeddings for the face
+                embedding = calculate_embeddings(face_img)
+                print(embedding)
+                # Check if the face matches the sample face
+                if is_face_matching(embedding):
+                    # Outline the face in green if it matches the sample face
+                    color = (0, 255, 0)  # Green color
+                    green_count += 1
+                else:
+                    # Outline the face in red if it doesn't match the sample face
+                    #send_message("an unknown person is on your property")
+                    color = (0, 0, 255)  # Red color
+                    red_count += 1
+                    cv2.rectangle(frame, (x, y), (x+w, y+h), color, 2)
         # Display the frame
         cv2.imshow("Face Detection", frame)
 
