@@ -15,7 +15,9 @@ pygame.mixer.init()
 #alarm_sound = pygame.mixer.Sound('alarm.wav')  # Replace 'alarm.wav' with the path to your alarm sound file
 
 # Function to play the alarm sound
-
+def play_alarm_sound():
+    pygame.mixer.music.load("alarm.mp3")  # Replace "alarm_sound.wav" with the path to your alarm sound file
+    pygame.mixer.music.play()
 # Load the Haar cascade classifier for face detection
 alg = "faceData.xml"
 haar_cascade = cv2.CascadeClassifier(alg)
@@ -187,7 +189,7 @@ while True:
                     text_image.fill(255)  # Fill with white color
                     # Add text to the image
                     font = cv2.FONT_HERSHEY_SIMPLEX
-                    cv2.putText(text_image, "Face Detected", (10, 50), font, 1, color, 2)
+                    cv2.putText(text_image, "Face Recognized", (10, 50), font, 1, color, 2)
 
                     # Display the text image in a separate window
                     cv2.imshow("Face Detection Status", text_image)
@@ -207,10 +209,12 @@ while True:
                     text_image.fill(255)  # Fill with white color
                     # Add text to the image
                     font = cv2.FONT_HERSHEY_SIMPLEX
-                    cv2.putText(text_image, "Face Not Detected", (10, 50), font, 1, color, 2)
+                    cv2.putText(text_image, "Face Not Recognized", (10, 50), font, 1, color, 2)
 
                     # Display the text image in a separate window
                     cv2.imshow("Face Detection Status", text_image)
+                    play_alarm_sound()
+
 
                     cv2.waitKey(3000)  # Wait for 3 seconds (3000 milliseconds)
                     cv2.destroyWindow("Face Detection Status")  # Close the window after 3 seconds
