@@ -99,12 +99,13 @@ def is_face_matching(embedding):
         # Compare the detected face embedding with each sample face embedding
         for data in sample_faces.values():
             sample_embedding = data.get("embedding")
+
             if sample_embedding is not None:
                 # Calculate the Euclidean distance between embeddings
                 distance = np.linalg.norm(np.array(embedding) - np.array(sample_embedding))
                 # Set a threshold for matching
-                print(distance)
-                if distance < 16:
+                print("distance:" ,distance)
+                if distance < 17:
                     return True
 
     # If no matching embedding is found, return False
@@ -143,8 +144,10 @@ while True:
         prev_frame = gray.copy()
 
         # Detect faces in the frame
-        print ("time: ", time_sec)
+        #print ("time: ", time_sec)
         if int(time_sec) % 10 == 0:
+            frame_with_detections = frame.copy()
+
             faces = haar_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
             # Loop through the detected faces
             for x, y, w, h in faces:
@@ -169,20 +172,51 @@ while True:
 
                 # Crop the face region
                 face_img = frame[y:y+h, x:x+w]
+                color = (0, 0, 255)  # Blue color
+
                 # Calculate embeddings for the face
                 embedding = calculate_embeddings(face_img)
-                print(embedding)
+                #print(embedding)
                 # Check if the face matches the sample face
                 if is_face_matching(embedding):
+                    print("face matching true" )
                     # Outline the face in green if it matches the sample face
                     color = (0, 255, 0)  # Green color
+                    # Create a blank image with white background to display text
+                    text_image = np.zeros((100, 300, 3), dtype=np.uint8)
+                    text_image.fill(255)  # Fill with white color
+                    # Add text to the image
+                    font = cv2.FONT_HERSHEY_SIMPLEX
+                    cv2.putText(text_image, "Face Detected", (10, 50), font, 1, color, 2)
+
+                    # Display the text image in a separate window
+                    cv2.imshow("Face Detection Status", text_image)
+
+                    cv2.waitKey(3000)  # Wait for 3 seconds (3000 milliseconds)
+                    cv2.destroyWindow("Face Detection Status")  # Close the window after 3 seconds
+
                     green_count += 1
+
                 else:
                     # Outline the face in red if it doesn't match the sample face
+                    print("face matching false")
                     #send_message("an unknown person is on your property")
                     color = (0, 0, 255)  # Red color
+                    # Create a blank image with white background to display text
+                    text_image = np.zeros((100, 300, 3), dtype=np.uint8)
+                    text_image.fill(255)  # Fill with white color
+                    # Add text to the image
+                    font = cv2.FONT_HERSHEY_SIMPLEX
+                    cv2.putText(text_image, "Face Not Detected", (10, 50), font, 1, color, 2)
+
+                    # Display the text image in a separate window
+                    cv2.imshow("Face Detection Status", text_image)
+
+                    cv2.waitKey(3000)  # Wait for 3 seconds (3000 milliseconds)
+                    cv2.destroyWindow("Face Detection Status")  # Close the window after 3 seconds
+
                     red_count += 1
-                    cv2.rectangle(frame, (x, y), (x+w, y+h), color, 2)
+
         # Display the frame
         cv2.imshow("Face Detection", frame)
 
