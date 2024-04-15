@@ -161,7 +161,6 @@ while True:
 
                 box_area = w * h
 
-
                 if box_area < 5000:  # Small box => person far from the camera
                     distance_estimation = "Far (5-10 feet)"
                     print(distance_estimation)
@@ -174,8 +173,6 @@ while True:
                     if (int(time_sec) % 120 == 0):
                        send_message("someone is on your property")
 
-
-
                 # Crop the face region
                 face_img = frame[y:y+h, x:x+w]
                 color = (0, 0, 255)  # Blue color
@@ -187,7 +184,6 @@ while True:
                 if is_face_matching(embedding):
                     print("face matching true" )
                     # Outline the face in green if it matches the sample face
-<<<<<<< Updated upstream
                     color = (0, 255, 0)  # Green color
                     # Create a blank image with white background to display text
                     text_image = np.zeros((100, 300, 3), dtype=np.uint8)
@@ -204,7 +200,6 @@ while True:
 
                     green_count += 1
 
-=======
                     temp = (0, 255, 0)  # Green color
                     green_count += 1
                     frame_on = True
@@ -213,12 +208,12 @@ while True:
                     b = y
                     c = w
                     d = h
->>>>>>> Stashed changes
+
                 else:
                     # Outline the face in red if it doesn't match the sample face
                     print("face matching false")
                     #send_message("an unknown person is on your property")
-<<<<<<< Updated upstream
+
                     color = (0, 0, 255)  # Red color
                     # Create a blank image with white background to display text
                     text_image = np.zeros((100, 300, 3), dtype=np.uint8)
@@ -236,7 +231,7 @@ while True:
                     cv2.destroyWindow("Face Detection Status")  # Close the window after 3 seconds
 
                     red_count += 1
-=======
+
                     temp = (0, 0, 255)  # Red color
                     red_count += 1
                     #cv2.rectangle(frame, (x, y), (x+w, y+h), color, 2)
@@ -246,7 +241,7 @@ while True:
                     b = y
                     c = w
                     d = h
->>>>>>> Stashed changes
+
 
         # Display the frame
         if int(time_sec) % 3 == 0:
