@@ -116,9 +116,13 @@ def is_face_matching(embedding):
 total_frames = 0
 green_count = 0  # Number of times box showed green
 red_count = 0    # Number of times box showed red
-
-
-
+frame_on = False
+visited = False
+a = 0
+b = 0
+c = 0
+d = 0
+temp = (0, 0, 255)  # Red color
 # Main loop to capture video frames
 while True:
     time_sec = time.time()
@@ -183,6 +187,7 @@ while True:
                 if is_face_matching(embedding):
                     print("face matching true" )
                     # Outline the face in green if it matches the sample face
+<<<<<<< Updated upstream
                     color = (0, 255, 0)  # Green color
                     # Create a blank image with white background to display text
                     text_image = np.zeros((100, 300, 3), dtype=np.uint8)
@@ -199,10 +204,21 @@ while True:
 
                     green_count += 1
 
+=======
+                    temp = (0, 255, 0)  # Green color
+                    green_count += 1
+                    frame_on = True
+                    visited = True
+                    a = x
+                    b = y
+                    c = w
+                    d = h
+>>>>>>> Stashed changes
                 else:
                     # Outline the face in red if it doesn't match the sample face
                     print("face matching false")
                     #send_message("an unknown person is on your property")
+<<<<<<< Updated upstream
                     color = (0, 0, 255)  # Red color
                     # Create a blank image with white background to display text
                     text_image = np.zeros((100, 300, 3), dtype=np.uint8)
@@ -220,8 +236,25 @@ while True:
                     cv2.destroyWindow("Face Detection Status")  # Close the window after 3 seconds
 
                     red_count += 1
+=======
+                    temp = (0, 0, 255)  # Red color
+                    red_count += 1
+                    #cv2.rectangle(frame, (x, y), (x+w, y+h), color, 2)
+                    frame_on = False
+                    visited = True
+                    a = x
+                    b = y
+                    c = w
+                    d = h
+>>>>>>> Stashed changes
 
         # Display the frame
+        if int(time_sec) % 3 == 0:
+            if frame_on and visited:
+                cv2.rectangle(frame, (a, b), (a + c, b + d), temp, 2)
+            elif not frame_on and visited:
+                cv2.rectangle(frame, (a, b), (a + c, b + d), temp, 2)
+
         cv2.imshow("Face Detection", frame)
 
         if total_frames >= 30:
