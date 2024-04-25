@@ -11,14 +11,14 @@ class FirebaseUtility:
     def add_table(self, table_name):
         try:
             self.db.child(table_name).set({})
-            print(f"Table '{table_name}' added successfully.")
+            print(f"table '{table_name}' added successfully.")
         except Exception as e:
             print("Error adding table:", e)
 
     def put_data(self, table_name, data):
         try:
             self.db.child(table_name).push(data)
-            print("Data added successfully.")
+            print("data added successfully.")
         except Exception as e:
             print("Error putting data:", e)
 
@@ -26,11 +26,11 @@ class FirebaseUtility:
         try:
             data = self.db.child(table_name).get()
             if data is None:
-                return None  # Table not found or empty
+                return None
             for key, value in data.items():
                 if attribute in value:
                     return value[attribute]
-            return None  # Attribute not found
+            return None
         except Exception as e:
             print("Error getting data:", e)
             return None
